@@ -1,0 +1,198 @@
+<!-- scraper/templates/scraper/comunity_dashboard.html -->
+
+{% extends "users/base.html" %}
+
+{% block title %} Community Dashboard {% endblock title %}
+
+{% block content %}
+{% load static %}
+<style>
+    /* Define CSS classes for different link statuses */
+.done {
+    color: green;
+}
+
+.revisit {
+    color: red;
+}
+
+/* Style the form and buttons */
+form {
+    display: inline-block;
+}
+
+select {
+    padding: 2px 6px; /* Adjust padding for a smaller size */
+    margin-right: 8px;
+    font-size: 14px; /* Set font size to make it smaller */
+    background-color: #f2f2f2; /* Background color */
+    border: none;
+    border-radius: 4px;
+}
+
+button {
+    padding: 2px 6px; /* Adjust padding for a smaller size */
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Style the card layout */
+.card {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin: 10px;
+    padding: 10px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card h2 {
+    margin-bottom: 10px;
+}
+
+.card ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.card ul li {
+    margin-bottom: 5px;
+}
+
+/* Style the star rating */
+.rating {
+    unicode-bidi: bidi-override;
+    direction: rtl;
+    text-align: center;
+    display: inline-block; /* Place the rating dots horizontally */
+}
+
+.rating > span {
+    display: inline-block;
+    position: relative;
+    width: 1.1em;
+    font-size: 20px;
+    margin-right: 5px; /* Add some spacing between the rating dots */
+}
+
+.rating > span:hover:before,
+.rating > span:hover ~ span:before {
+    content: "\2605";
+    position: absolute;
+    left: 0;
+    color: gold;
+}
+
+.average-rating {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+/* Additional CSS for hiding and showing links */
+.links-container.hidden {
+    display: none;
+}
+
+.view-more-button.hidden,
+.hide-button {
+    display: none;
+}
+.add-to-dashboard-button {
+        padding: 2px 6px;
+        background-color: #4285f4;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        margin-top: 5px;
+    }
+
+    .add-to-dashboard-button:hover {
+        background-color: #307ae6;
+    }
+
+</style>
+    <h1>Welcome to the Community Dashboard</h1>
+
+<body>
+    {% for keyword, mylinks in links_by_keyword.items %}
+    <div class="card" id="card_{{ keyword.id }}">
+        <h2>{{ keyword.keyword }}</h2>
+        <ul class="links-container hidden">
+            {% for link in mylinks %}
+            <div class="card">
+                <li>
+                    {% if link.title %}
+                    <a href="{{ link.url }}">
+                        {{ link.title|slice:":50" }}
+                    </a>
+                    {% else %}
+                    <a href="{{ link.url }}">
+                        {{ link.url|slice:":80" }}
+                    </a>
+                    {% endif %}
+                    <p class="average-rating">Average Rating: {{ link.average_rating|floatformat:"2" }}
+                        Rated: {{ link.total_ratings }}
+                    </p>
+                    <form method="post" action="{% url 'rate_link' link.id %}">
+                        {% csrf_token %}
+                        <div class="rating">
+                            <input type="radio" name="rating" id="star5_{{ link.id }}" value="5">
+                            <label for="star5_{{ link.id }}"></label>
+                            <input type="radio" name="rating" id="star4_{{ link.id }}" value="4">
+                            <label for="star4_{{ link.id }}"></label>
+                            <input type="radio" name="rating" id="star3_{{ link.id }}" value="3">
+                            <label for="star3_{{ link.id }}"></label>
+                            <input type="radio" name="rating" id="star2_{{ link.id }}" value="2">
+                            <label for="star2_{{ link.id }}"></label>
+                            <input type="radio" name="rating" id="star1_{{ link.id }}" value="1">
+                            <label for="star1_{{ link.id }}"></label>
+                        </div>
+                        <button type="submit">Rate</button>
+                    </form>
+                    <a type="submit" href="{% url 'add_to_dashboard' link.id %}" class="add-to-dashboard-button">Add to My Dashboard</a>
+                </li>
+            </div>
+            {% empty %}
+            <li>No articles available.</li>
+            {% endfor %}
+        </ul>
+        {% if mylinks|length > 3 %}
+        <button class="view-more-button" onclick="showMoreLinks({{ keyword.id }})">View</button>
+        <button class="hide-button hidden" onclick="hideLinks({{ keyword.id }})">Hide</button>
+        {% endif %}
+    </div>
+    {% endfor %}
+</body>
+
+<script>
+    // Function to show more links
+    function showMoreLinks(keywordId) {
+        const cardElement = document.getElementById(`card_${keywordId}`);
+        const linksContainer = cardElement.querySelector('.links-container');
+        const viewMoreButton = cardElement.querySelector('.view-more-button');
+        const hideButton = cardElement.querySelector('.hide-button');
+        linksContainer.classList.remove('hidden');
+        viewMoreButton.classList.add('hidden');
+        hideButton.classList.remove('hidden');
+    }
+
+    // Function to hide the links
+    function hideLinks(keywordId) {
+        const cardElement = document.getElementById(`card_${keywordId}`);
+        const linksContainer = cardElement.querySelector('.links-container');
+        const viewMoreButton = cardElement.querySelector('.view-more-button');
+        const hideButton = cardElement.querySelector('.hide-button');
+        linksContainer.classList.add('hidden');
+        viewMoreButton.classList.remove('hidden');
+        hideButton.classList.add('hidden');
+    }
+</script>
+
+
+{% endblock content %}

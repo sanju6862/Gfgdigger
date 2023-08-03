@@ -1,0 +1,69 @@
+{% extends "users/base.html" %}
+{% block title %}Profile Page{% endblock title %}
+{% block content %}
+    <div class="row my-3 p-3">
+        <img class="rounded-circle account-img" src="{{ user.profile.avatar.url }}" style="cursor: pointer;"/>
+    </div>
+    {% if user_form.errors %}
+        <div class="alert alert-danger alert-dismissible" role="alert">
+            <div id="form_errors">
+                {% for key, value in user_form.errors.items %}
+                    <strong>{{ value }}</strong>
+                {% endfor %}
+            </div>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endif %}
+    <div class="form-content">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="col-md-5">
+                    <div class="form-group">
+                        <label class="small mb-1">First Name:</label>
+                        {{ user_form.first_name }}
+                        <label class="small mb-1">Last Name:</label>
+                        {{ user_form.last_name }}
+                        <label class="small mb-1">Username:</label>
+                        {{ user_form.username }}
+                        <label class="small mb-1">Email:</label>
+                        {{ user_form.email }}
+                    </div>
+                    <div class="form-group">
+                        <a href="{% url 'password_change' %}">Change Password</a>
+                        <hr>
+                        <label class="small mb-1">Change Avatar:</label>
+                        {{ profile_form.avatar }}
+                    </div>
+                    <label class="small mb-1">Bio:</label>
+                    {{ profile_form.bio }}
+                    <label class="small mb-1">City:</label>
+                    {{ profile_form.address_city }}
+                    <label class="small mb-1">State:</label>
+                    {{ profile_form.address_state }}
+                    <label class="small mb-1">Pin:</label>
+                    {{ profile_form.address_pin }}
+                    <label class="small mb-1">Locality:</label>
+                    {{ profile_form.address_locality }}
+                    <label class="small mb-1">Registration Year:</label>
+                    {{ profile_form.registration_year }}
+                    <label class="small mb-1">Passing Out Year:</label>
+                    {{ profile_form.passing_out_year }}
+                    <label class="small mb-1">Department:</label>
+                    {{ profile_form.department }}
+                    <label class="small mb-1">Contact (Self):</label>
+                    {{ profile_form.contact_self }}
+                    <label class="small mb-1">Contact (Parents):</label>
+                    {{ profile_form.contact_parents }}
+                    <label class="small mb-1">User Type:</label>
+                    {{ profile_form.user_type }}
+                </div>
+            </div>
+            <br><br>
+            <button type="submit" class="btn btn-dark btn-lg">Save Changes</button>
+            <button type="reset" class="btn btn-dark btn-lg">Reset</button>
+        </form>
+    </div>
+{% endblock content %}

@@ -1,0 +1,45 @@
+{% extends "users/base.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>profile</title>
+    {%load static %}
+    <link rel="stylesheet"  href="{% static 'facialsearch.css' %}">
+</head>
+<body>
+    <h1>Profile</h1>
+    {%if profile is none %} 
+    <p>No user found</p>
+    {%endif%}
+    <div class="card">
+        <div class="row my-3 p-3">
+            <img class="rounded-circle account-img" src="{{ profile.avatar.url }}" style="cursor: pointer;"/>
+        </div>
+        <div class="card-header">
+            <h3>{{ profile.user.first_name }}</h3>
+            <h3>{{ profile.user.email }}</h3>
+        </div>
+        <div class="card-body">
+            <ul>
+                <li><strong>Username:</strong> {{ profile.user.username }}</li>
+                <li><strong>Bio:</strong> {{ profile.bio }}</li>
+                <li><strong>Address City:</strong> {{ profile.address_city }}</li>
+                <li><strong>Address State:</strong> {{ profile.address_state }}</li>
+                <li><strong>Address Pin:</strong> {{ profile.address_pin }}</li>
+                <li><strong>Address Locality:</strong> {{ profile.address_locality }}</li>
+                <li><strong>Registration Year:</strong> {{ profile.registration_year }}</li>
+                <li><strong>Passing Out Year:</strong> {{ profile.passing_out_year }}</li>
+                <li><strong>Department:</strong> {{ profile.department }}</li>
+                <li><strong>Contact Self:</strong> {{ profile.contact_self }}</li>
+                <li><strong>Contact Parents:</strong> {{ profile.contact_parents }}</li>
+            </ul>
+        </div>
+    </div>
+  
+   
+    
+</body>
+</html>
+{% endblock %}
+<a href="/facialsearch/" class="button"> search more </a>

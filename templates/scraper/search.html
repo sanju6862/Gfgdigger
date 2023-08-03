@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+{% extends "users/base.html" %}
+{% block content %}
+<html>
+<head>
+    <title>Search GeeksforGeeks</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        var scrapingInProgress = false;
+        var duration = {{ form.duration.value }};  // Get the duration from the form field
+
+        function updateTimer(remainingSeconds) {
+            var minutes = Math.floor(remainingSeconds / 60);
+            var seconds = remainingSeconds % 60;
+            $('#timer').html(minutes + 'm ' + seconds + 's');
+        }
+
+        function startScraping() {
+            if (scrapingInProgress) {
+                return;
+            }
+
+            var formData = $('#keyword-form').serialize();
+            $.ajax({
+                type: 'POST',
+                url: '{% url 'search' %}',
+                data: formData,
+                beforeSend: function() {
+                    $('#result').html('Scraping in progress... Please wait.');
+                    $('#stop-button').prop('disabled', false);
+                    scrapingInProgress = true;
+
+                    // Start the countdown timer
+                    var remainingSeconds = duration * 60;
+                    updateTimer(remainingSeconds);
+                    var timerInterval = setInterval(function() {
+                        remainingSeconds--;
+                        updateTimer(remainingSeconds);
+                        if (remainingSeconds <= 0) {
+                            clearInterval(timerInterval);
+                            $('#timer').html('Time is up!');
+                        }
+                    }, 1000);
+                },
+                success: function(data) {
+                    $('#result').html(data.message);
+                    $('#stop-button').prop('disabled', true);
+                    scrapingInProgress = false;
+                }
+            });
+        }
+
+        function stopScraping() {
+            if (!scrapingInProgress) {
+                return;
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: '{% url 'search' %}',
+                data: {
+                    'stop_scraping': 'True'
+                },
+                success: function(data) {
+                    $('#result').html(data.message);
+                    $('#stop-button').prop('disabled', true);
+                    scrapingInProgress = false;
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Search GeeksforGeeks</h1>
+    <form id="keyword-form" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="button" onclick="startScraping()">Start Scraping</button>
+        <button type="button" id="stop-button" onclick="stopScraping()" disabled>Stop Digging</button>
+    </form>
+    <div>
+        <span>Remaining Time: </span><span id="timer"></span>
+    </div>
+    <div id="result"></div>
+</body>
+</html>
+{% endblock content %}
